@@ -97,6 +97,6 @@ fn part2(filename: &str) -> io::Result<()> {
 }
 
 fn main() {
-    part1("./src/input1.txt").unwrap();
-    part2("./src/input2.txt").unwrap();
+    part1("./src/input.txt").unwrap();
+    part2("./src/input.txt").unwrap();
 }
