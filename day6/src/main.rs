@@ -16,7 +16,9 @@ fn part1(filename: &str) -> io::Result<()> {
     for line in reader.lines() {
         let line = line.unwrap();
         for val in line.split_whitespace() {
-            if val.contains(":") { continue; }
+            if val.contains(":") {
+                continue;
+            }
             if line_counter == 0 {
                 times.push(val.parse::<i64>().unwrap());
             } else {
@@ -49,13 +51,36 @@ fn part2(filename: &str) -> io::Result<()> {
     let reader = io::BufReader::new(file);
 
     let mut ans = 0;
+    let mut time: i64 = 0;
+    let mut distance: i64 = 0;
+
+    let mut line_counter = 0;
 
     for line in reader.lines() {
         let line = line.unwrap();
-        
+        for val in line.split_whitespace() {
+            if val.contains(":") {
+                continue;
+            }
+            let ival = val.parse::<i64>().unwrap();
+            if line_counter == 0 {
+                time *= (10 as i64).pow(val.len() as u32);
+                time += ival;
+            } else {
+                distance *= (10 as i64).pow(val.len() as u32);
+                distance += ival;
+            }
+        }
+        line_counter += 1;
     }
 
-    println!("Part 2: {}", ans);
+    for j in 1..time {
+        if (time - j) * j > distance {
+            ans += 1;
+        }
+    }
+
+    println!("Part 1: {}", ans);
 
     Ok(())
 }
