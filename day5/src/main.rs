@@ -43,8 +43,8 @@ fn part1(filename: &str) -> io::Result<()> {
                 [destination, source, range] => (destination, source, range),
                 _ => panic!("Unexpected number of parts"), // or handle error differently
             };
-            let source = source.parse::<i64>().unwrap();
             let destination = destination.parse::<i64>().unwrap();
+            let source = source.parse::<i64>().unwrap();
             let range = range.parse::<i64>().unwrap();
 
             for i in 0..seeds.len() {
