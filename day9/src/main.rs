@@ -36,8 +36,18 @@ fn part2(filename: &str) -> io::Result<()> {
     let mut ans = 0;
 
     for line in reader.lines() {
-        let line = line.unwrap();
-        
+        let mut numbers = line.unwrap().split_whitespace().map(|x| x.parse::<i64>().unwrap()).collect::<Vec<i64>>();
+        numbers.reverse();
+        let mut aux = numbers.clone();
+        for n in (1..numbers.len()).rev() {
+
+            for i in 0..n {
+                aux[i] = aux[i+1] - aux[i];
+            }
+
+            ans += aux[n];
+        }
+
     }
 
     println!("Part 2: {}", ans);
