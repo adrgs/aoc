@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
+use gcd::Gcd;
 
 fn part1(filename: &str) -> io::Result<()> {
     let path = Path::new(filename);
@@ -59,36 +60,36 @@ fn part2(filename: &str) -> io::Result<()> {
         .collect();
 
     let mut ans = 0;
-    let mut nodes: Vec<&str> = graph.keys().filter_map(|node| {
-        if node.ends_with("A") {
-            Some(node.as_str())
-        } else {
-            None
-        }
-    }).collect();
-
-    loop {
-        let mut good = true;
-        for i in 0..nodes.len() {
-            let node = nodes[i];
-
-            if steps.chars().nth(ans % steps.len()).unwrap() == 'R' {
-                nodes[i] = &graph[node].1;
+    let nodes: Vec<&str> = graph
+        .keys()
+        .filter_map(|node| {
+            if node.ends_with("A") {
+                Some(node.as_str())
             } else {
-                nodes[i] = &graph[node].0;
+                None
             }
-            
-            if !nodes[i].ends_with("Z") {
-                good = false;
-            }
+        })
+        .collect();
+
+    let mut cycles: Vec<usize> = Vec::new();
+    for node in nodes {
+        let mut node = node;
+        let mut cycle = 0;
+        while !node.ends_with("Z") {
+            let next_node = &graph[node];
+            node = if steps.chars().nth((ans + cycle) % steps.len()).unwrap() == 'R' {
+                &next_node.1
+            } else {
+                &next_node.0
+            };
+            cycle += 1;
         }
-        ans += 1;
-        if good {
-            break;
-        }
+        cycles.push(cycle);
     }
 
-    println!("Part 2: {}", ans);
+    let lcm = cycles.iter().fold(1 as u128, |a, b| (a*(*b as u128))/a.gcd(*b as u128));
+
+    println!("Part 2: {}", lcm);
 
     Ok(())
 }
