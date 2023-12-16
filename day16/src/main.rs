@@ -136,9 +136,55 @@ fn part2(filename: &str) -> io::Result<()> {
     let reader = io::BufReader::new(file);
 
     let mut ans = 0;
+    let mut matrix: Vec<Vec<u8>> = Vec::new();
 
     for line in reader.lines() {
         let line = line.unwrap();
+
+        let mut row: Vec<u8> = Vec::new();
+        for c in line.chars() {
+            match c {
+                '.' => row.push(0),
+                '|' => row.push(1 << 0),
+                '-' => row.push(1 << 1),
+                '/' => row.push(1 << 2),
+                '\\' => row.push(1 << 3),
+                _ => (),
+            }
+        }
+        matrix.push(row);
+    }
+
+    fn get_result(matrix: &Vec<Vec<u8>>) -> i32 {
+        let mut ans = 0;
+        for i in 0..matrix.len() {
+            for j in 0..matrix[0].len() {
+                if matrix[i][j] >> 4 > 0 {
+                    ans += 1;
+                }
+            }
+        }
+        ans
+    }
+
+    for j in 0..matrix[0].len() {
+        let mut new_matrix = matrix.clone();
+        traverse(&mut new_matrix, 0, j as i32, Direction::Down);
+        ans = ans.max(get_result(&new_matrix));
+
+        let mut new_matrix = matrix.clone();
+        traverse(&mut new_matrix, matrix.len() as i32 - 1, j as i32, Direction::Up);
+        ans = ans.max(get_result(&new_matrix));
+    }
+
+    for i in 0..matrix.len() {
+        let mut new_matrix = matrix.clone();
+        traverse(&mut new_matrix, i as i32, 0, Direction::Right);
+        ans = ans.max(get_result(&new_matrix));
+
+        let mut new_matrix = matrix.clone();
+        traverse(&mut new_matrix, i as i32, matrix[0].len() as i32 - 1, Direction::Left);
+        ans = ans.max(get_result(&new_matrix));
     }
 
     println!("Part 2: {}", ans);
