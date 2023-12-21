@@ -1,4 +1,4 @@
-use std::collections::VecDeque;
+use std::collections::{VecDeque, HashSet, HashMap};
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
@@ -71,12 +71,68 @@ fn part2(filename: &str) -> io::Result<()> {
     let file = File::open(&path)?;
     let reader = io::BufReader::new(file);
 
-    let mut ans = 0;
+    let matrix: Vec<Vec<i32>> = reader
+    .lines()
+    .map(|line| {
+        line.unwrap().chars()
+            .map(|c| if c == '#' { -1 } else if c == 'S' { -2 } else { 0 })
+            .collect()
+    })
+    .collect();
 
-    for line in reader.lines() {
-        let line = line.unwrap();
-        
+    let n = matrix.len() as i32; // assume square matrix
+    let mut rocks: HashSet<(i32, i32)> = HashSet::new();
+
+    let mut start = (0, 0);
+    for i in 0..matrix.len() {
+        for j in 0..matrix[i].len() {
+            if matrix[i][j] == -2 {
+                start = (i as i32, j as i32);
+            } else if matrix[i][j] == -1 {
+                rocks.insert((i as i32, j as i32));
+            }
+        }
     }
+
+    let mut possible: HashSet<(i32, i32)> = HashSet::new();
+    let mut points: HashMap<i32, i64> = HashMap::new();
+
+    possible.insert(start);
+
+    let steps = 26501365;
+
+    for s in 1..steps {
+        let mut new_possible: HashSet<(i32, i32)> = HashSet::new();
+        for (i, j) in &possible {
+            for di in -1..(2 as i32) {
+                for dj in -1..(2 as i32) {
+                    if di.abs() == dj.abs() {
+                        continue;
+                    }
+                    if rocks.contains(&((i + di).rem_euclid(n), (j + dj).rem_euclid(n))) {
+                        continue;
+                    }
+                    new_possible.insert((i + di, j + dj));
+                }
+            }
+        }
+        let x = new_possible.len();
+        possible = new_possible;
+        if s % n == steps % n {
+            points.insert(s/n, x as i64);
+        }
+        if points.len() == 3 {
+            break;
+        }
+    }
+
+    let x = steps as i64/n as i64;
+
+    let a = (points[&2] + points[&0] - 2 * points[&1])/2;
+    let b = points[&1] - points[&0] - a;
+    let c = points[&0];
+
+    let ans = a*(x.pow(2)) + b*x + c;
 
     println!("Part 2: {}", ans);
 
