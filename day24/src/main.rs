@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 use z3::ast::Ast;
-use z3::{Config, Context, ast, Solver, Optimize};
+use z3::{ast, Config, Context, Optimize, Solver};
 
 #[derive(Debug)]
 struct Hailstone {
@@ -28,11 +28,17 @@ fn part1(filename: &str) -> io::Result<()> {
 
     for line in reader.lines() {
         let line = line.unwrap();
-        
+
         let (coords, vel) = line.split_once(" @ ").unwrap();
 
-        let coords = coords.split(',').map(|x| x.trim().parse::<i64>().unwrap()).collect::<Vec<i64>>();
-        let vel = vel.split(',').map(|x| x.trim().parse::<i64>().unwrap()).collect::<Vec<i64>>();
+        let coords = coords
+            .split(',')
+            .map(|x| x.trim().parse::<i64>().unwrap())
+            .collect::<Vec<i64>>();
+        let vel = vel
+            .split(',')
+            .map(|x| x.trim().parse::<i64>().unwrap())
+            .collect::<Vec<i64>>();
 
         hailstones.push(Hailstone {
             x: coords[0],
@@ -45,12 +51,12 @@ fn part1(filename: &str) -> io::Result<()> {
     }
 
     for i in 0..hailstones.len() {
-        for j in i+1..hailstones.len() {
+        for j in i + 1..hailstones.len() {
             let hailstone_a = &hailstones[i];
             let hailstone_b = &hailstones[j];
 
-            let cfg = Config::new(); 
-            let ctx = Context::new(&cfg); 
+            let cfg = Config::new();
+            let ctx = Context::new(&cfg);
             let solver = Optimize::new(&ctx);
 
             let ta = ast::Real::new_const(&ctx, "ta");
@@ -108,11 +114,17 @@ fn part2(filename: &str) -> io::Result<()> {
 
     for line in reader.lines() {
         let line = line.unwrap();
-        
+
         let (coords, vel) = line.split_once(" @ ").unwrap();
 
-        let coords = coords.split(',').map(|x| x.trim().parse::<i64>().unwrap()).collect::<Vec<i64>>();
-        let vel = vel.split(',').map(|x| x.trim().parse::<i64>().unwrap()).collect::<Vec<i64>>();
+        let coords = coords
+            .split(',')
+            .map(|x| x.trim().parse::<i64>().unwrap())
+            .collect::<Vec<i64>>();
+        let vel = vel
+            .split(',')
+            .map(|x| x.trim().parse::<i64>().unwrap())
+            .collect::<Vec<i64>>();
 
         hailstones.push(Hailstone {
             x: coords[0],
@@ -124,8 +136,8 @@ fn part2(filename: &str) -> io::Result<()> {
         });
     }
 
-    let cfg = Config::new(); 
-    let ctx = Context::new(&cfg); 
+    let cfg = Config::new();
+    let ctx = Context::new(&cfg);
     let solver = Solver::new(&ctx);
 
     let xr = ast::Int::new_const(&ctx, "xr");
@@ -162,10 +174,9 @@ fn part2(filename: &str) -> io::Result<()> {
 
     let model = solver.get_model().unwrap();
 
-    let ans = 
-        model.get_const_interp(&xr).unwrap().as_i64().unwrap() +
-        model.get_const_interp(&yr).unwrap().as_i64().unwrap() +
-        model.get_const_interp(&zr).unwrap().as_i64().unwrap();
+    let ans = model.get_const_interp(&xr).unwrap().as_i64().unwrap()
+        + model.get_const_interp(&yr).unwrap().as_i64().unwrap()
+        + model.get_const_interp(&zr).unwrap().as_i64().unwrap();
 
     println!("Part 2: {}", ans);
 
