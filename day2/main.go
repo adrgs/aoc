@@ -48,10 +48,28 @@ func part2(filename string) {
 	defer file.Close()
 
 	ans := 0
+	horizontal := 0
+	depth := 0
+	aim := 0
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
+		data := strings.Split(scanner.Text(), " ")
+		switch data[0] {
+		case "forward":
+			number, _ := strconv.Atoi(data[1])
+			horizontal += number
+			depth += number * aim
+		case "up":
+			number, _ := strconv.Atoi(data[1])
+			aim -= number
+		case "down":
+			number, _ := strconv.Atoi(data[1])
+			aim += number
+		}
 	}
+
+	ans = horizontal * depth
 
 	fmt.Println("Part 1: ", ans)
 }
