@@ -44,12 +44,25 @@ func part2(filename string) {
 	}
 	defer file.Close()
 
+	arr := []int{}
+	ans := 0
+
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+		number, err := strconv.Atoi(scanner.Text())
+		if err != nil {
+			panic(err)
+		}
+
+		arr = append(arr, number)
 	}
 
-	ans := 0
+	for i := 3; i < len(arr); i++ {
+		if arr[i] > arr[i-3] {
+			ans += 1
+		}
+	}
+
 	fmt.Println("Part 1: ", ans)
 }
 
