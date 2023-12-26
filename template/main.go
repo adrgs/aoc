@@ -39,9 +39,6 @@ func part2(filename string) {
 }
 
 func main() {
-	name := "template"
-	filename := "./" + name + "/input.txt"
-
-	part1(filename)
-	part2(filename)
+	part1("./input.txt")
+	part2("./input.txt")
 }
