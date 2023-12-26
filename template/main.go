@@ -13,12 +13,13 @@ func part1(filename string) {
 	}
 	defer file.Close()
 
+	ans := 0
+
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		fmt.Println(scanner.Text())
 	}
 
-	ans := 0
 	fmt.Println("Part 1: ", ans)
 }
 
@@ -29,12 +30,13 @@ func part2(filename string) {
 	}
 	defer file.Close()
 
+	ans := 0
+
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		fmt.Println(scanner.Text())
 	}
 
-	ans := 0
 	fmt.Println("Part 1: ", ans)
 }
 
