@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 use z3::ast::Ast;
-use z3::{Config, Context, Optimize, ast};
+use z3::{Config, Context, ast, Solver, Optimize};
 
 #[derive(Debug)]
 struct Hailstone {
@@ -51,14 +51,14 @@ fn part1(filename: &str) -> io::Result<()> {
 
             let cfg = Config::new(); 
             let ctx = Context::new(&cfg); 
-            let opt = Optimize::new(&ctx);
+            let solver = Optimize::new(&ctx);
 
             let ta = ast::Real::new_const(&ctx, "ta");
             let tb = ast::Real::new_const(&ctx, "tb");
 
             let zero = ast::Int::from_i64(&ctx, 0);
-            opt.assert(&ta.ge(&ast::Real::from_int(&zero)));
-            opt.assert(&tb.ge(&ast::Real::from_int(&zero)));
+            solver.assert(&ta.ge(&ast::Real::from_int(&zero)));
+            solver.assert(&tb.ge(&ast::Real::from_int(&zero)));
 
             let xa = ast::Real::from_int(&ast::Int::from_i64(&ctx, hailstone_a.x));
             let ya = ast::Real::from_int(&ast::Int::from_i64(&ctx, hailstone_a.y));
@@ -79,20 +79,16 @@ fn part1(filename: &str) -> io::Result<()> {
             let lb = ast::Real::from_int(&ast::Int::from_i64(&ctx, test_lb));
             let ub = ast::Real::from_int(&ast::Int::from_i64(&ctx, test_ub));
 
-            opt.assert(&xa.ge(&lb));
-            opt.assert(&xa.le(&ub));
+            solver.assert(&xa.ge(&lb));
+            solver.assert(&xa.le(&ub));
 
-            opt.assert(&ya.ge(&lb));
-            opt.assert(&ya.le(&ub));
+            solver.assert(&ya.ge(&lb));
+            solver.assert(&ya.le(&ub));
 
-            opt.assert(&xa._eq(&xb));
-            opt.assert(&ya._eq(&yb));
+            solver.assert(&xa._eq(&xb));
+            solver.assert(&ya._eq(&yb));
 
-            opt.check(&[]);
-
-            let model = opt.get_model().unwrap();
-            
-            if model.to_string() != "" {
+            if solver.check(&[]) == z3::SatResult::Sat {
                 ans += 1;
             }
         }
@@ -108,12 +104,68 @@ fn part2(filename: &str) -> io::Result<()> {
     let file = File::open(&path)?;
     let reader = io::BufReader::new(file);
 
-    let mut ans = 0;
+    let mut hailstones = Vec::new();
 
     for line in reader.lines() {
         let line = line.unwrap();
         
+        let (coords, vel) = line.split_once(" @ ").unwrap();
+
+        let coords = coords.split(',').map(|x| x.trim().parse::<i64>().unwrap()).collect::<Vec<i64>>();
+        let vel = vel.split(',').map(|x| x.trim().parse::<i64>().unwrap()).collect::<Vec<i64>>();
+
+        hailstones.push(Hailstone {
+            x: coords[0],
+            y: coords[1],
+            z: coords[2],
+            dx: vel[0],
+            dy: vel[1],
+            dz: vel[2],
+        });
     }
+
+    let cfg = Config::new(); 
+    let ctx = Context::new(&cfg); 
+    let solver = Solver::new(&ctx);
+
+    let xr = ast::Int::new_const(&ctx, "xr");
+    let yr = ast::Int::new_const(&ctx, "yr");
+    let zr = ast::Int::new_const(&ctx, "zr");
+
+    let dxr = ast::Int::new_const(&ctx, "dxr");
+    let dyr = ast::Int::new_const(&ctx, "dyr");
+    let dzr = ast::Int::new_const(&ctx, "dzr");
+
+    let zero = ast::Int::from_i64(&ctx, 0);
+
+    for i in 0..hailstones.len() {
+        let hailstone = &hailstones[i];
+
+        let x = ast::Int::from_i64(&ctx, hailstone.x);
+        let y = ast::Int::from_i64(&ctx, hailstone.y);
+        let z = ast::Int::from_i64(&ctx, hailstone.z);
+
+        let dx = ast::Int::from_i64(&ctx, hailstone.dx);
+        let dy = ast::Int::from_i64(&ctx, hailstone.dy);
+        let dz = ast::Int::from_i64(&ctx, hailstone.dz);
+
+        let t = ast::Int::new_const(&ctx, format!("t{}", i));
+
+        solver.assert(&(&xr + &dxr * &t)._eq(&(&x + &dx * &t)));
+        solver.assert(&(&yr + &dyr * &t)._eq(&(&y + &dy * &t)));
+        solver.assert(&(&zr + &dzr * &t)._eq(&(&z + &dz * &t)));
+
+        solver.assert(&t.ge(&zero));
+    }
+
+    solver.check();
+
+    let model = solver.get_model().unwrap();
+
+    let ans = 
+        model.get_const_interp(&xr).unwrap().as_i64().unwrap() +
+        model.get_const_interp(&yr).unwrap().as_i64().unwrap() +
+        model.get_const_interp(&zr).unwrap().as_i64().unwrap();
 
     println!("Part 2: {}", ans);
 
