@@ -74,11 +74,33 @@ func part2(filename string) {
 
 	ans := 0
 
+	var matrix [1000][1000]int
+
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
+		s := strings.Split(scanner.Text(), " -> ")
+		segment := segment{}
+		fmt.Sscanf(s[0], "%d,%d", &segment.x1, &segment.y1)
+		fmt.Sscanf(s[1], "%d,%d", &segment.x2, &segment.y2)
+
+		if segment.y1 == segment.y2 {
+			for i := min(segment.x1, segment.x2); i <= max(segment.x1, segment.x2); i++ {
+				matrix[segment.y1][i]++
+			}
+		} else if segment.x1 == segment.x2 {
+			for i := min(segment.y1, segment.y2); i <= max(segment.y1, segment.y2); i++ {
+				matrix[i][segment.x1]++
+			}
+		}
 	}
 
-	fmt.Println("Part 1: ", ans)
+	for i := 0; i < 1000; i++ {
+		for j := 0; j < 1000; j++ {
+			if matrix[i][j] >= 2 {
+				ans++
+			}
+		}
+	}
 }
 
 func main() {
