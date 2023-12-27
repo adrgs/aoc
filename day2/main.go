@@ -37,7 +37,7 @@ func part1(filename string) {
 
 	ans = horizontal * depth
 
-	fmt.Println("Part 1: ", ans)
+	fmt.Println("Part 1:", ans)
 }
 
 func part2(filename string) {
@@ -71,7 +71,7 @@ func part2(filename string) {
 
 	ans = horizontal * depth
 
-	fmt.Println("Part 1: ", ans)
+	fmt.Println("Part 1:", ans)
 }
 
 func main() {
