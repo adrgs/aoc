@@ -34,7 +34,7 @@ func part1(filename string) {
 
 	}
 
-	fmt.Println("Part 1: ", ans)
+	fmt.Println("Part 2:", ans)
 }
 
 func part2(filename string) {
@@ -63,7 +63,7 @@ func part2(filename string) {
 		}
 	}
 
-	fmt.Println("Part 1: ", ans)
+	fmt.Println("Part 1:", ans)
 }
 
 func main() {
