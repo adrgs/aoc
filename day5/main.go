@@ -25,6 +25,15 @@ func max(a, b int) int {
 	return b
 }
 
+func sign(a int) int {
+	if a < 0 {
+		return -1
+	} else if a > 0 {
+		return 1
+	}
+	return 0
+}
+
 func part1(filename string) {
 	file, err := os.Open(filename)
 	if err != nil {
@@ -62,7 +71,7 @@ func part1(filename string) {
 		}
 	}
 
-	fmt.Println("Part 1: ", ans)
+	fmt.Println("Part 1:", ans)
 }
 
 func part2(filename string) {
@@ -84,12 +93,24 @@ func part2(filename string) {
 		fmt.Sscanf(s[1], "%d,%d", &segment.x2, &segment.y2)
 
 		if segment.y1 == segment.y2 {
-			for i := min(segment.x1, segment.x2); i <= max(segment.x1, segment.x2); i++ {
-				matrix[segment.y1][i]++
+			for j := min(segment.x1, segment.x2); j <= max(segment.x1, segment.x2); j++ {
+				matrix[segment.y1][j]++
 			}
 		} else if segment.x1 == segment.x2 {
 			for i := min(segment.y1, segment.y2); i <= max(segment.y1, segment.y2); i++ {
 				matrix[i][segment.x1]++
+			}
+		} else {
+			j, i := segment.x1, segment.y1
+			for {
+				matrix[i][j]++
+
+				j += sign(segment.x2 - segment.x1)
+				i += sign(segment.y2 - segment.y1)
+				if j == segment.x2 && i == segment.y2 {
+					matrix[i][j]++
+					break
+				}
 			}
 		}
 	}
@@ -101,6 +122,8 @@ func part2(filename string) {
 			}
 		}
 	}
+
+	fmt.Println("Part 2:", ans)
 }
 
 func main() {
