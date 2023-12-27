@@ -45,7 +45,7 @@ func part1(filename string) {
 
 	ans = gamma * eps
 
-	fmt.Println("Part 1: ", ans)
+	fmt.Println("Part 1:", ans)
 }
 
 func filter(i int, numbers []string, least bool) string {
@@ -120,7 +120,7 @@ func part2(filename string) {
 
 	ans = numberO2 * numberCO2
 
-	fmt.Println("Part 2: ", ans)
+	fmt.Println("Part 2:", ans)
 }
 
 func main() {
