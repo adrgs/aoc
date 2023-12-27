@@ -132,10 +132,110 @@ func part2(filename string) {
 	ans := 0
 
 	scanner := bufio.NewScanner(file)
+	lines := []string{}
+
 	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
 	}
 
-	fmt.Println("Part 1: ", ans)
+	bingoNumbers := []int{}
+
+	for _, number := range strings.Split(lines[0], ",") {
+		iNumber, _ := strconv.Atoi(number)
+		bingoNumbers = append(bingoNumbers, iNumber)
+	}
+
+	type bingo [5][5]int
+
+	bingos := []bingo{}
+
+	splitFn := func(c rune) bool {
+		return c == ' '
+	}
+
+	for i := 2; i < len(lines); i += 6 {
+		b := bingo{}
+		for j := 0; j < 5; j++ {
+			for k, number := range strings.FieldsFunc(lines[i+j], splitFn) {
+				iNumber, _ := strconv.Atoi(number)
+				b[j][k] = iNumber
+			}
+		}
+		bingos = append(bingos, b)
+	}
+
+	markBingo := func(bingo *bingo, number int) {
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				if bingo[i][j] == number {
+					bingo[i][j] = -1
+				}
+			}
+		}
+	}
+
+	checkBingo := func(bingo bingo) bool {
+		for i := 0; i < 5; i++ {
+			good := true
+
+			for j := 0; j < 5; j++ {
+				if bingo[i][j] != -1 {
+					good = false
+					break
+				}
+			}
+
+			if good {
+				return true
+			}
+		}
+
+		for j := 0; j < 5; j++ {
+			good := true
+
+			for i := 0; i < 5; i++ {
+				if bingo[i][j] != -1 {
+					good = false
+					break
+				}
+			}
+
+			if good {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	sumBingo := func(bingo bingo) int {
+		sum := 0
+
+		for i := 0; i < 5; i++ {
+			for j := 0; j < 5; j++ {
+				if bingo[i][j] != -1 {
+					sum += bingo[i][j]
+				}
+			}
+		}
+
+		return sum
+	}
+
+	won := map[int]bool{}
+
+	for _, nr := range bingoNumbers {
+		for i := 0; i < len(bingos); i++ {
+			markBingo(&bingos[i], nr)
+			_, ok := won[i]
+			if !ok && checkBingo(bingos[i]) {
+				won[i] = true
+				ans = sumBingo(bingos[i]) * nr
+			}
+		}
+	}
+
+	fmt.Println("Part 2: ", ans)
 }
 
 func main() {
