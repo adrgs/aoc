@@ -54,10 +54,37 @@ func part2(filename string) {
 	defer file.Close()
 
 	ans := 0
+	lanternfish := make([]int, 0)
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+		text := scanner.Text()
+		for _, val := range strings.Split(text, ",") {
+			number, err := strconv.Atoi(val)
+			if err != nil {
+				continue
+			}
+			lanternfish = append(lanternfish, number)
+		}
+	}
+
+	lanternFishState := make([]int, 9)
+	for _, val := range lanternfish {
+		lanternFishState[val]++
+	}
+
+	for i := 0; i < 256; i++ {
+		newLanternFishState := make([]int, 9)
+		for j := 0; j < 8; j++ {
+			newLanternFishState[j] = lanternFishState[j+1]
+		}
+		newLanternFishState[6] += lanternFishState[0]
+		newLanternFishState[8] += lanternFishState[0]
+		lanternFishState = newLanternFishState
+	}
+
+	for _, val := range lanternFishState {
+		ans += val
 	}
 
 	fmt.Println("Part 2:", ans)
